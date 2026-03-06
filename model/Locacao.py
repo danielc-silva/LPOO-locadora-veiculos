@@ -47,7 +47,7 @@ class Locacao:
     
     def registrar_devolucao_de_veiculo (self, data_devolucao):
         self.data_fim = data_devolucao
-        if not(self.data_inicio < self.data_fim):
+        if not(self.data_inicio <= self.data_fim):
             print (f'A data está incorreta!\nA data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].')
             self.data_fim = None
             return
