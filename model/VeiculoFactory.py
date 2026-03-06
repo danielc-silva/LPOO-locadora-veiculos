@@ -1,6 +1,6 @@
 from .Carro import Carro
 from .Motorhome import Motorhome
-
+from .ExcecoesPersonalizadas import TipoVeiculoInvalidoError
 from .Carro import Carro
 from .Motorhome import Motorhome
 from .Categoria import Categoria
@@ -27,4 +27,4 @@ class VeiculoFactory():
             ) 
             
         else:
-            raise ValueError(f'Tipo de veículo desconhecido: {tipo_veiculo}')
+            raise TipoVeiculoInvalidoError(f"Erro: A locadora não trabalha com o tipo '{tipo_veiculo}'. Escolha Carro ou Motorhome.")

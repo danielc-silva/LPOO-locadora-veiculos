@@ -2,10 +2,11 @@ from datetime import date, time, datetime, timedelta
 from .Veiculo import Veiculo
 
 class Locacao:
-    def __init__(self, data_inicio=None, data_fim=None, veiculo=None):
+    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo):
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.veiculo = veiculo
+        self.valor_locacao = 0.00
 
     @property
     def data_inicio(self):
@@ -37,24 +38,45 @@ class Locacao:
             raise TypeError("O valor informado deve ser um objeto do tipo Veículo!")
 
     def calcular_valor_locacao(self):
-        pass
-        #IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-        #IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+        if (self.data_inicio == self.data_fim):
+            diferenca = 1
+        else:
+            diferenca = (self.data_fim - self.data_inicio).days
+        valor_final_locacao = (diferenca * self.veiculo.taxa_diaria) + self.veiculo.valor_seguro
+        self.valor_locacao = valor_final_locacao
+    
+    def registrar_devolucao_de_veiculo (self, data_devolucao):
+        self.data_fim = data_devolucao
+        if not(self.data_inicio < self.data_fim):
+            print (f'A data está incorreta!\nA data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].')
+            self.data_fim = None
+            return
+        else:
+            self.calcular_valor_locacao()
 
     def valida_data(self, data_recebida):
-        # 1. Se for nulo, apenas retorna nulo
         if data_recebida is None:
             return None
-        
-        # 2. BÔNUS: Se a pessoa já passou um objeto 'date' pronto (sem ser string), a gente só aceita e retorna ele!
         if isinstance(data_recebida, date):
             return data_recebida
-            
-        # 3. Se for string, tenta converter
         try:
             temporario = datetime.strptime(data_recebida, "%d-%m-%Y")
-            return temporario.date() # Retorna apenas a parte da data (ano, mês, dia)
+            return temporario.date()
         except ValueError:
             raise ValueError(
                 f"ERRO: Data '{data_recebida}' em formato inválido. Use DD-MM-YYYY."
             )
+        
+
+    def __str__(self):
+        mostrar = "==================================="
+        mostrar += f"\nMostrando dados da Locação"
+        mostrar += f"\nData inicio: {self.data_inicio}"
+        if (self.data_fim is None):
+            mostrar += f"\nData fim: Veículo ainda se encontra locado."
+        else:
+            mostrar += f"\nData fim = {self.data_fim}"
+        mostrar += f"\nPlaca veículo Locado: {self.veiculo.placa}"
+        mostrar += f"\nValor locação: {self.valor_locacao}"
+        mostrar += "\n==================================="
+        return  mostrar

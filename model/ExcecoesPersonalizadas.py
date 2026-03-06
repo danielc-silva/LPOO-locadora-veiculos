@@ -6,5 +6,5 @@ class PlacaInvalidaError (Exception):
 class DataInvalidaError (Exception):
     pass
 
-class Algo (Exception):
+class TipoVeiculoInvalidoError(Exception):
     pass
