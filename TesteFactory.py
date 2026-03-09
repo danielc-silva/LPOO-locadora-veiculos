@@ -1,6 +1,6 @@
 from model.VeiculoFactory import VeiculoFactory
 from model.Categoria import Categoria
-from model.ExcecoesPersonalizadas import PlacaInvalidaError
+from model.ExcecoesPersonalizadas import PlacaInvalidaError, TipoVeiculoInvalidoError
 
 def testar_factory():
     print("="*40)
@@ -48,10 +48,12 @@ def testar_factory():
     print("\n[Teste 3] Solicitando veículo desconhecido...")
     try:
         caminhao = VeiculoFactory.criar_veiculo('Caminhao', placa='ABC1234')
-        print("FALHA: A Factory criou um Caminhão que não existe no código!")
-    except ValueError as e:
-        print("SUCESSO: A Factory impediu a criação de um tipo desconhecido.")
-        print(f" ---> Motivo bloqueado: {e}")
+        print("❌ FALHA: A Factory criou um Caminhão que não existe no código!")
+        
+    # MUDE A LINHA ABAIXO:
+    except TipoVeiculoInvalidoError as e:
+        print("✅ SUCESSO: A Factory impediu a criação de um tipo desconhecido.")
+        print(f"   ---> Motivo bloqueado: {e}")
 
     print("\n" + "="*40)
     print("TESTES FINALIZADOS")

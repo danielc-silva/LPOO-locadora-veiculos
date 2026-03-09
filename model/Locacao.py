@@ -1,12 +1,14 @@
 from datetime import date, time, datetime, timedelta
 from .Veiculo import Veiculo
+from .LocacaoStrategy import CalculoVIPStrategy, CalculoPadraoStrategy, CalculoLocacaoStrategy
 
 class Locacao:
-    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo):
+    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy):
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.veiculo = veiculo
         self.valor_locacao = 0.00
+        self.estrategia = estrategia
 
     @property
     def data_inicio(self):
@@ -39,11 +41,12 @@ class Locacao:
 
     def calcular_valor_locacao(self):
         if (self.data_inicio == self.data_fim):
-            diferenca = 1
+            diferenca_de_dias = 1
         else:
-            diferenca = (self.data_fim - self.data_inicio).days
-        valor_final_locacao = (diferenca * self.veiculo.taxa_diaria) + self.veiculo.valor_seguro
-        self.valor_locacao = valor_final_locacao
+            diferenca_de_dias = (self.data_fim - self.data_inicio).days
+        #valor_final_locacao = (diferenca_de_dias * self.veiculo.taxa_diaria) + self.veiculo.valor_seguro
+        #self.valor_locacao = valor_final_locacao
+        self.valor_locacao = self.estrategia.calcuar_diarias(self.veiculo, diferenca_de_dias)
     
     def registrar_devolucao_de_veiculo (self, data_devolucao):
         self.data_fim = data_devolucao

@@ -3,6 +3,7 @@ from model.VeiculoFactory import VeiculoFactory
 from model.Categoria import Categoria
 from model.Locacao import Locacao
 from model.ExcecoesPersonalizadas import TipoVeiculoInvalidoError
+from model.LocacaoStrategy import CalculoLocacaoStrategy, CalculoPadraoStrategy, CalculoVIPStrategy
 
 #carro1 = Carro (placa= "dli9956", categoria= 'EXECUTIVO', taxa_diaria= 2.5)
 #print(carro1)
