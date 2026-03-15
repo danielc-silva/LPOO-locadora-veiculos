@@ -3,7 +3,7 @@ from .Veiculo import Veiculo
 from .LocacaoStrategy import CalculoVIPStrategy, CalculoPadraoStrategy, CalculoLocacaoStrategy
 
 class Locacao:
-    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy):
+    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy()):
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.veiculo = veiculo
