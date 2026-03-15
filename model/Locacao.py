@@ -35,6 +35,8 @@ class Locacao:
     def veiculo(self, obj):
         # Permite None (para inicialização vazia) OU um objeto Veiculo
         if obj is None or isinstance(obj, Veiculo):
+            if obj is not None:
+                obj.tentar_alugar()
             self.__veiculo = obj
         else:
             raise TypeError("O valor informado deve ser um objeto do tipo Veículo!")
