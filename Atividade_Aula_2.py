@@ -35,8 +35,16 @@ try:
     locacao2.registrar_devolucao_de_veiculo("10-2-2026")
     print(locacao2)
 
-    # Teste de devolução no mesmo dia (0 dias)
-    locacao3 = Locacao("12-2-2026", data_fim=None, veiculo=carro2)
+    # CRIAMOS UM CARRO NOVO AQUI, POIS O CARRO 2 CONTINUA ALUGADO (A DEVOLUÇÃO ACIMA FALHOU)
+    carro3 = VeiculoFactory.criar_veiculo(
+                'Carro', 
+                placa='BRA2E21', 
+                taxa_diaria=180.50,
+                categoria=Categoria.ECONOMICO
+            )
+
+    # Teste de devolução no mesmo dia (0 dias) - Usando o carro3 que está Disponível
+    locacao3 = Locacao("12-2-2026", data_fim=None, veiculo=carro3)
     locacao3.registrar_devolucao_de_veiculo("12-2-2026")
     print(locacao3)
 

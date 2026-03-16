@@ -42,22 +42,28 @@ class Locacao:
             raise TypeError("O valor informado deve ser um objeto do tipo Veículo!")
 
     def calcular_valor_locacao(self):
-        if (self.data_inicio == self.data_fim):
+        if self.data_fim is None:
+            raise ValueError("Impossível calcular o valor, a data de devolução não foi definida.")
+
+        if self.data_inicio == self.data_fim:
             diferenca_de_dias = 1
         else:
             diferenca_de_dias = (self.data_fim - self.data_inicio).days
-        #valor_final_locacao = (diferenca_de_dias * self.veiculo.taxa_diaria) + self.veiculo.valor_seguro
-        #self.valor_locacao = valor_final_locacao
-        self.valor_locacao = self.estrategia.calcuar_diarias(self.veiculo, diferenca_de_dias)
+            
+        return self.estrategia.calcuar_diarias(self.veiculo, diferenca_de_dias)
     
-    def registrar_devolucao_de_veiculo (self, data_devolucao):
+    def registrar_devolucao_de_veiculo(self, data_devolucao):
         self.data_fim = data_devolucao
-        if not(self.data_inicio <= self.data_fim):
-            print (f'A data está incorreta!\nA data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].')
+        if not (self.data_inicio <= self.data_fim):
+            print(f"A data está incorreta!\nA data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].")
             self.data_fim = None
             return
         else:
-            self.calcular_valor_locacao()
+            # Aqui nós chamamos o cálculo e guardamos na variável da locação
+            self.valor_locacao = self.calcular_valor_locacao()
+            # chamando o state para liberar o carro no sistema
+            if self.veiculo is not None:
+                self.veiculo.tentar_devolver()
 
     def valida_data(self, data_recebida):
         if data_recebida is None:
