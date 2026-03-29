@@ -20,13 +20,10 @@ class Veiculo (ABC):
         self.__estado_atual = novo_estado
 
     # métodos do state
-
     def tentar_alugar(self):
         self.estado_atual.alugar()
-
     def tentar_devolver(self):
         self.estado_atual.devolver()
-
     def reter_na_frota_pra_conserto(self):
         self.estado_atual.enviar_manutencao()
 
@@ -64,8 +61,14 @@ class Veiculo (ABC):
         return self.__taxa_diaria
     
     @taxa_diaria.setter
-    def taxa_diaria (self, taxa_diaria):
-        self.__taxa_diaria = taxa_diaria
+    def taxa_diaria(self, valor):
+        if not isinstance(valor, (int, float)):
+            raise TypeError("Erro: A taxa diária deve ser um valor numérico.")
+            
+        if valor < 0:
+            raise ValueError("Erro: A taxa diária não pode ser um valor negativo.")
+            
+        self.__taxa_diaria = float(valor)
 
     @property
     def valor_seguro (self):
@@ -79,7 +82,34 @@ class Veiculo (ABC):
             raise ValueError("Erro: O valor do seguro não pode ser negativo.")
         self.__valor_seguro = float(valor)
 
+    @property
+    def categoria(self):
+        return self.__categoria
+        
+    @categoria.setter
+    def categoria(self, valor):
+        if isinstance(valor, Categoria):
+            self.__categoria = valor
+            
+        elif isinstance(valor, str):
+            texto_limpo = valor.strip().upper()
+            
+            if texto_limpo == "ECONOMICO":
+                self.__categoria = Categoria.ECONOMICO
+            elif texto_limpo == "EXECUTIVO":
+                self.__categoria = Categoria.EXECUTIVO
+            else:
+                raise ValueError(f"Erro: A categoria '{valor}' é inválida. Escolha Economico ou Executivo.")
+                
+        else:
+            raise TypeError("Erro: O formato da categoria é inválido.")
+
     def __str__(self):
         nome_classe_filha_de_veiculo = self.__class__.__name__
         nome_estado = self.estado_atual.__class__.__name__
-        return f"{nome_classe_filha_de_veiculo} (placa='{self.placa}', categoria='{self.categoria}', taxa_diaria={self.taxa_diaria}, valor_seguro={self.valor_seguro}, estado='{nome_estado}')"
+        return f"{nome_classe_filha_de_veiculo} (placa='{self.placa}', categoria='{self.categoria}', taxa_diaria={self.taxa_diaria}, valor_seguro={self.valor_seguro}, estado='{self.nome_estado}')"
+
+    def exibir_dados(self):
+        nome_classe_filha_de_veiculo = self.__class__.__name__
+        nome_estado = self.estado_atual.__class__.__name__
+        return f"{nome_classe_filha_de_veiculo}\nPlaca: {self.placa}\nCategoria: {self.categoria.name.capitalize()}\nTaxa Diaria: {self.taxa_diaria}\nValor Seguro: {self.valor_seguro}\nEstado: {nome_estado}"
