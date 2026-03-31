@@ -17,8 +17,8 @@ class VeiculoDAO (GenericDAO):
         
         try:
             cursor = self.conexao.cursor()
-            query = "INSER INTO tb_veiculos (vei_placa, vei_categoria, vei_taxa_diaria, vei_estado_atual, vei_tipo) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(query, (objeto_veiculo.placa, objeto_veiculo.categoria.value, objeto_veiculo.taxa_diaria, objeto_veiculo.estado_atual.__class__.__name__, objeto_veiculo__class__.__name__))
+            query = "INSERT INTO tb_veiculos (vei_placa, vei_categoria, vei_taxa_diaria, vei_estado_atual, vei_tipo) VALUES (%s, %s, %s, %s, %s)"            
+            cursor.execute(query, (objeto_veiculo.placa, objeto_veiculo.categoria.value, objeto_veiculo.taxa_diaria, objeto_veiculo.estado_atual.__class__.__name__, objeto_veiculo.__class__.__name__))            
             self.conexao.commit()
             return True, "Veículo cadastrado com sucesso"
 
@@ -32,17 +32,26 @@ class VeiculoDAO (GenericDAO):
                 cursor.close()
 
 
-    def listar_todos(self, objeto_veiculo):
+    def listar_todos(self):
         if not self.conexao:
             return []
                 
         try:
             cursor = self.conexao.cursor()
             query = "SELECT vei_tipo, vei_placa, vei_categoria, vei_taxa_diaria FROM tb_veiculos"
+            
+            cursor.execute(query) 
+            
             linhas = cursor.fetchall()
             veiculos = []
+            
             for cada_linha in linhas:
-                obj = VeiculoFactory.criar_veiculo( cada_linha[0], cada_linha[1], cada_linha[2], float(cada_linha[3]))
+                obj = VeiculoFactory.criar_veiculo(
+                    tipo_veiculo=cada_linha[0], 
+                    placa=cada_linha[1], 
+                    categoria=cada_linha[2], 
+                    taxa_diaria=float(cada_linha[3])
+                )
                 veiculos.append(obj)
             
             return veiculos

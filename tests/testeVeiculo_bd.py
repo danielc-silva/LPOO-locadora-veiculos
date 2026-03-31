@@ -8,12 +8,17 @@ from model.VeiculoFactory import VeiculoFactory
 
 dao = VeiculoDAO()
 
-novo_carro = VeiculoFactory.criar_veiculo("caro", "ABC1D34", Categoria.ECONOMICO, 150)
+novo_carro = VeiculoFactory.criar_veiculo(
+    "Carro", 
+    placa="ABC1D34", 
+    categoria=Categoria.ECONOMICO, 
+    taxa_diaria=150
+)
 
 dao.salvar(novo_carro)
 
 lista_veiculos = dao.listar_todos()
 
-print(f"Total de Veículos cadastrados: {len(lista_veiculos)}")
+print(f"Total de Veículos cadastrados: {len(lista_veiculos)}\n")
 for obj in lista_veiculos:
-    print(obj)
+    print(obj.exibir_dados())

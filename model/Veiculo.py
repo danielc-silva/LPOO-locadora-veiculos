@@ -106,10 +106,9 @@ class Veiculo (ABC):
 
     def __str__(self):
         nome_classe_filha_de_veiculo = self.__class__.__name__
-        nome_estado = self.estado_atual.__class__.__name__
-        return f"{nome_classe_filha_de_veiculo} (placa='{self.placa}', categoria='{self.categoria}', taxa_diaria={self.taxa_diaria}, valor_seguro={self.valor_seguro}, estado='{self.nome_estado}')"
+        return f"{nome_classe_filha_de_veiculo} (placa='{self.placa}', categoria='{self.categoria}', taxa_diaria={self.taxa_diaria}, valor_seguro={self.valor_seguro}, estado='{self.estado_atual.__class__.__name__}')"
 
     def exibir_dados(self):
         nome_classe_filha_de_veiculo = self.__class__.__name__
         nome_estado = self.estado_atual.__class__.__name__
-        return f"{nome_classe_filha_de_veiculo}\nPlaca: {self.placa}\nCategoria: {self.categoria.name.capitalize()}\nTaxa Diaria: {self.taxa_diaria}\nValor Seguro: {self.valor_seguro}\nEstado: {nome_estado}"
+        return f"{nome_classe_filha_de_veiculo}\nPlaca: {self.placa}\nCategoria: {self.categoria.name.capitalize()}\nTaxa Diaria: {self.taxa_diaria}\nValor Seguro: {self.valor_seguro}\nEstado: {self.estado_atual.__class__.__name__}"
