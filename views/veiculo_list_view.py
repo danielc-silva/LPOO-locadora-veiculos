@@ -9,7 +9,13 @@ sys.path.append(caminho_projeto)
 
 from model.VeiculoFactory import VeiculoFactory
 
-veiculos_em_memoria = [] # armazena os veículos criados
+from dao.veiculo_dao import VeiculoDAO
+
+veiculos_em_memoria = []
+
+dao = VeiculoDAO()
+
+veiculos_em_memoria = dao.listar_todos()
 
 def atualizar_lista_na_tela():
     for item in tabela.get_children():
@@ -48,6 +54,9 @@ def cadastrar_veiculo():
             )
             
             veiculos_em_memoria.append(novo_veiculo)
+            
+            dao.salvar(novo_veiculo) 
+            
             atualizar_lista_na_tela()
             
             messagebox.showinfo("Sucesso", "Veículo cadastrado!")
@@ -149,5 +158,6 @@ btn_verInfo.pack (side = "right", padx = 8, pady = 2)
 btn_novo = tk.Button(footer, text="Novo", command= cadastrar_veiculo)
 btn_novo.pack (side = "right", padx = 8, pady = 2)
 
+atualizar_lista_na_tela()
 
 janela.mainloop()
