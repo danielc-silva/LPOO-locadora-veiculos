@@ -1,163 +1,113 @@
 import tkinter as tk
-from tkinter import ttk 
-from tkinter import Label, Entry, Button, messagebox
-
+from tkinter import ttk, Label, Button, messagebox
 import sys
 import os
+
 caminho_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(caminho_projeto)
 
-from model.VeiculoFactory import VeiculoFactory
+from control.veiculo_controller import VeiculoController 
+from views.veiculo_view import JanelaCadastroVeiculo 
 
-from dao.veiculo_dao import VeiculoDAO
-
-veiculos_em_memoria = []
-
-dao = VeiculoDAO()
-
-veiculos_em_memoria = dao.listar_todos()
-
-def atualizar_lista_na_tela():
-    for item in tabela.get_children():
-        tabela.delete(item)
+class JanelaListagemVeiculos(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
         
-    for veiculo in veiculos_em_memoria:
-        tipo = veiculo.__class__.__name__
+        self.title("Locadora de Veículos")
+        self.geometry("1050x600")
         
-        tabela.insert("", tk.END, values=(
-            tipo, 
-            veiculo.placa, 
-            veiculo.categoria.name.capitalize(), 
-            f"R$ {veiculo.taxa_diaria:.2f}",  
-            f"R$ {veiculo.valor_seguro:.2f}"
-        ))
+        self.controller = VeiculoController()
 
+        Label(self, text="Veículos Cadastrados", font=("Arial", 14, "bold"), pady=10).pack()
 
-def cadastrar_veiculo():
-    cadastrar = tk.Toplevel(janela)
-    cadastrar.title("Formulário de Cadastro")
-    cadastrar.geometry("300x300")
+        self.tabela = ttk.Treeview(self, columns=("Nome", "Placa", "Categoria", "Taxa Diária", "Seguro"), show='headings')
+        self.tabela.heading("Nome", text="Nome")
+        self.tabela.heading("Placa", text="Placa")
+        self.tabela.heading("Categoria", text="Categoria")
+        self.tabela.heading("Taxa Diária", text="Taxa Diária")
+        self.tabela.heading("Seguro", text="Seguro")
+        self.tabela.pack()
 
-    cadastrar.transient(janela)
-    cadastrar.grab_set()
-    cadastrar.focus_force()
+        footer = tk.Frame(self, bg="lightgrey", bd=1, relief="raised")
+        footer.pack(side="bottom", fill="x")
 
-    lbl_titulo = Label(cadastrar, text="Cadastrar Veículo", font=("Arial", 14, "bold"), pady=10).pack()
+        tk.Label(footer, text="MENU", bg="lightgrey", fg="black", font=("Arial", 10, "bold")).pack(side="left", padx=10, pady=5)
 
-    def salvar_veiculo():
-        try:
-            novo_veiculo = VeiculoFactory.criar_veiculo(
-                tipo_veiculo=str(combo_tipo.get()),
-                placa=str(txt_placa.get()).replace(" ", ""), 
-                categoria=str(combo_categoria.get()),
-                taxa_diaria=float(txt_taxa_diaria_digitada.get())
-            )
+        tk.Button(footer, text="Sair", command=self.master.destroy).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Remover", command=self.remover_veiculo).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Atualizar", command=self.abrir_tela_edicao).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Ver Informações", command=self.ver_informacoes).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Novo", command=self.abrir_tela_cadastro).pack(side="right", padx=8, pady=2)
+
+        self.atualizar_lista_na_tela()
+
+    def atualizar_lista_na_tela(self):
+        for item in self.tabela.get_children():
+            self.tabela.delete(item)
             
-            veiculos_em_memoria.append(novo_veiculo)
-            
-            dao.salvar(novo_veiculo) 
-            
-            atualizar_lista_na_tela()
-            
-            messagebox.showinfo("Sucesso", "Veículo cadastrado!")
-            cadastrar.destroy()
-            
-        except Exception as erro:
+        veiculos = self.controller.listar_veiculos()
+        
+        if veiculos: 
+            for veiculo in veiculos:
+                tipo = veiculo.__class__.__name__
+                self.tabela.insert("", tk.END, values=(
+                    tipo, 
+                    veiculo.placa, 
+                    veiculo.categoria.name.capitalize(), 
+                    f"R$ {veiculo.taxa_diaria:.2f}",  
+                    f"R$ {veiculo.valor_seguro:.2f}"
+                ))
 
-            messagebox.showwarning("Atenção", str(erro))
+    def abrir_tela_cadastro(self):
+        janela_cadastro = JanelaCadastroVeiculo(self)
+        self.wait_window(janela_cadastro)
+        self.atualizar_lista_na_tela()
 
-    lbl_placa = Label(cadastrar, text="Placa:").pack()
-    txt_placa = Entry(cadastrar)
-    txt_placa.pack(pady=5)
+    def abrir_tela_edicao(self):
+        selecionado = self.tabela.selection()
+        if not selecionado:
+            messagebox.showwarning("Aviso", "Selecione um veículo na tabela primeiro para editar.")
+            return
+        
+        valores = self.tabela.item(selecionado[0], "values")
+        placa_clicada = str(valores[1]).strip()
+        
+        veiculo_para_editar = self.controller.buscar_por_placa(placa_clicada)
+        
+        if veiculo_para_editar:
+            janela_edicao = JanelaCadastroVeiculo(self, veiculo_existente=veiculo_para_editar)
+            self.wait_window(janela_edicao)
+            self.atualizar_lista_na_tela()
+        else:
+            messagebox.showerror("Erro", "Não foi possível carregar os dados do veículo.")
 
-    lbl_taxa_diaria_digitada = Label(cadastrar, text="Taxa diária:").pack()
-    txt_taxa_diaria_digitada = Entry(cadastrar)
-    txt_taxa_diaria_digitada.pack(pady=5)
-
-    combo_tipo = ttk.Combobox(cadastrar, values=["Carro", "Motorhome"], state="readonly")
-    combo_tipo.set("Selecione o Tipo")
-    combo_tipo.pack(pady=5)
-
-    combo_categoria = ttk.Combobox(cadastrar, values=["Economico", "Executivo"], state="readonly")
-    combo_categoria.set("Selecione a Categoria")
-    combo_categoria.pack(pady=5)
-    
-    btn_calcular = Button(cadastrar, text="Salvar", command=salvar_veiculo).pack()
-    
-
-def ver_informacoes():
-    selecionado = tabela.selection()
-    if not selecionado:
-        messagebox.showwarning("Aviso", "Selecione um veículo na tabela primeiro.")
-        return
-    
-    valores = tabela.item(selecionado[0], "values")
-    
-    placa_clicada = str(valores[1]).strip() 
-    
-    for veiculo in veiculos_em_memoria:
-        if str(veiculo.placa).strip() == placa_clicada:
+    def ver_informacoes(self):
+        selecionado = self.tabela.selection()
+        if not selecionado:
+            messagebox.showwarning("Aviso", "Selecione um veículo na tabela primeiro.")
+            return
+        
+        valores = self.tabela.item(selecionado[0], "values")
+        placa_clicada = str(valores[1]).strip() 
+        
+        veiculo = self.controller.buscar_por_placa(placa_clicada)
+        if veiculo:
             messagebox.showinfo("Informações do Veículo", str(veiculo.exibir_dados()))
-            break
+        else:
+            messagebox.showerror("Erro", "Veículo não encontrado no Banco de Dados.")
 
-    
-def remover_veiculo():
-    global veiculos_em_memoria
-    
-    selecionado = tabela.selection()
-    if not selecionado:
-        messagebox.showwarning("Aviso", "Selecione um veículo na tabela primeiro para remover.")
-        return
-    
-    valores = tabela.item(selecionado[0], "values")
-    
-    placa_clicada = str(valores[1]).strip()
-    
-    veiculos_em_memoria = [v for v in veiculos_em_memoria if str(v.placa).strip() != placa_clicada]
-    
-    atualizar_lista_na_tela()
-    messagebox.showinfo("Sucesso", f"O veículo com placa {placa_clicada} foi removido com sucesso!")
-
-#####################################################################################################################################################
-# 1. Criar a janela
-janela = tk.Tk()
-
-# 2. Configuração da janela
-janela.title("Locadora de Veículos")
-janela.geometry("1050x600")
-
-lbl_titulo = Label(janela, text="Veículos Cadastrados", font=("Arial", 14, "bold"), pady=10).pack()
-
-tabela = ttk.Treeview(janela, columns=("Nome", "Placa", "Categoria", "Taxa Diária", "Seguro"), show='headings')
-tabela.heading("Nome", text="Nome")
-tabela.heading("Placa", text="Placa")
-tabela.heading("Categoria", text="Categoria")
-tabela.heading("Taxa Diária", text="Taxa Diária")
-tabela.heading("Seguro", text="Seguro")
-
-tabela.pack()
-
-# tree.insert("", tk.END, values=("2", "Item B"))
-
-footer = tk.Frame(janela, bg="lightgrey", bd=1, relief="raised")
-footer.pack(side="bottom", fill="x")
-
-# 2. Adicionar itens (labels/buttons) ao rodapé
-label_menu = tk.Label(footer, text="MENU", bg="lightgrey", fg="black", font=("Arial", 10, "bold"))
-label_menu.pack(side="left", padx=10, pady=5)
-
-button_sair = tk.Button(footer, text="Sair", command=janela.quit)
-button_sair.pack(side="right", padx=8, pady=2)
-
-btn_remover = tk.Button(footer, text="Remover", command= remover_veiculo)
-btn_remover.pack (side = "right", padx = 8, pady = 2)
-
-btn_verInfo = tk.Button(footer, text="Ver Informações", command= ver_informacoes)
-btn_verInfo.pack (side = "right", padx = 8, pady = 2)
-
-btn_novo = tk.Button(footer, text="Novo", command= cadastrar_veiculo)
-btn_novo.pack (side = "right", padx = 8, pady = 2)
-
-atualizar_lista_na_tela()
-
-janela.mainloop()
+    def remover_veiculo(self):
+        selecionado = self.tabela.selection()
+        if not selecionado:
+            messagebox.showwarning("Aviso", "Selecione um veículo na tabela primeiro para remover.")
+            return
+        
+        valores = self.tabela.item(selecionado[0], "values")
+        placa_clicada = str(valores[1]).strip()
+        
+        sucesso, mensagem = self.controller.remover_veiculo(placa_clicada)
+        if sucesso:
+            self.atualizar_lista_na_tela() 
+            messagebox.showinfo("Sucesso", mensagem)
+        else:
+            messagebox.showwarning("Aviso", mensagem)
