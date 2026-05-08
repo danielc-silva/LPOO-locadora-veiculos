@@ -35,7 +35,7 @@ class JanelaListagemVeiculos(tk.Toplevel):
 
         tk.Button(footer, text="Sair", command=self.master.destroy).pack(side="right", padx=8, pady=2)
         tk.Button(footer, text="Remover", command=self.remover_veiculo).pack(side="right", padx=8, pady=2)
-        tk.Button(footer, text="Atualizar", command=self.abrir_tela_edicao).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Editar", command=self.abrir_tela_edicao).pack(side="right", padx=8, pady=2)
         tk.Button(footer, text="Ver Informações", command=self.ver_informacoes).pack(side="right", padx=8, pady=2)
         tk.Button(footer, text="Novo", command=self.abrir_tela_cadastro).pack(side="right", padx=8, pady=2)
 
