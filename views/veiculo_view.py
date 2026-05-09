@@ -57,8 +57,7 @@ class JanelaCadastroVeiculo(tk.Toplevel):
         if self.veiculo_existente:
             self.txt_placa.insert(0, self.veiculo_existente.placa)
             self.txt_placa.config(state="disabled") 
-            self.cb_tipo.set(self.veiculo_existente.__class__.__name__)
-            self.cb_tipo.config(state="disabled") 
+            self.cb_tipo.set(self.veiculo_existente.__class__.__name__) 
             self.cb_categoria.set(self.veiculo_existente.categoria.name.upper())
             self.txt_taxa.insert(0, f"{self.veiculo_existente.taxa_diaria}")
 
