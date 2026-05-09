@@ -1,14 +1,41 @@
 from datetime import date, time, datetime, timedelta
 from .Veiculo import Veiculo
 from .LocacaoStrategy import CalculoVIPStrategy, CalculoPadraoStrategy, CalculoLocacaoStrategy
+from .StatusLocacao import StatusLocacao
 
 class Locacao:
-    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy()):
+    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy(), status = StatusLocacao.RESERVADO):
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.veiculo = veiculo
         self.valor_locacao = 0.00
         self.estrategia = estrategia
+        self.status = status
+
+    @property
+    def status(self):
+        return self.__status
+        
+    @status.setter
+    def status(self, valor):
+        if isinstance(valor, status):
+            self.status = valor
+            
+        elif isinstance(valor, str):
+            texto_limpo = valor.strip().upper()
+            
+            if texto_limpo == "RESERVADO":
+                self.__categoria = Categoria.RESERVADO
+            elif texto_limpo == "LOCADO":
+                self.__categoria = Categoria.LOCADO
+            elif texto_limpo == "DEVOLVIDO":
+                self.__categoria = Categoria.DEVOLVIDO
+            elif texto_limpo == "CANCELADO":
+                self.__categoria = Categoria.CANCELADO
+            else:
+                raise ValueError(f"Erro: O status '{valor}' é inválido. Escolha Reservado, Locado, Devolvido ou Cancelado.")
+        else:
+            raise TypeError("Erro: O formato do status é inválido.")
 
     @property
     def data_inicio(self):
