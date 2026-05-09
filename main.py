@@ -17,4 +17,4 @@ if __name__ == "__main__":
     app = JanelaListagemVeiculos(master=root)
     app.protocol("WM_DELETE_WINDOW", root.destroy)
     
-    root.mainloop()
+    root.mainloop() 
