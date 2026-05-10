@@ -9,7 +9,6 @@ class VeiculoFactory():
     @staticmethod
     def criar_veiculo(tipo_veiculo: str, **args):
         if tipo_veiculo == 'Carro':
-            # Veja que aqui NÃO passamos o valor_seguro
             return Carro(
                 placa=args.get('placa', None),
                 categoria=args.get('categoria', Categoria.ECONOMICO),
@@ -18,7 +17,6 @@ class VeiculoFactory():
             )
             
         elif tipo_veiculo == 'Motorhome':
-            # Aqui também NÃO passamos o valor_seguro
             return Motorhome(
                 placa=args.get('placa', None),
                 categoria=args.get('categoria', Categoria.ECONOMICO),

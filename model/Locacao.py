@@ -18,22 +18,21 @@ class Locacao:
         
     @status.setter
     def status(self, valor):
-        if isinstance(valor, status):
-            self.status = valor
+        if isinstance(valor, StatusLocacao):
+            self.__status = valor 
             
         elif isinstance(valor, str):
             texto_limpo = valor.strip().upper()
-            
             if texto_limpo == "RESERVADO":
-                self.__categoria = Categoria.RESERVADO
+                self.__status = StatusLocacao.RESERVADO
             elif texto_limpo == "LOCADO":
-                self.__categoria = Categoria.LOCADO
+                self.__status = StatusLocacao.LOCADO
             elif texto_limpo == "DEVOLVIDO":
-                self.__categoria = Categoria.DEVOLVIDO
+                self.__status = StatusLocacao.DEVOLVIDO
             elif texto_limpo == "CANCELADO":
-                self.__categoria = Categoria.CANCELADO
+                self.__status = StatusLocacao.CANCELADO
             else:
-                raise ValueError(f"Erro: O status '{valor}' é inválido. Escolha Reservado, Locado, Devolvido ou Cancelado.")
+                raise ValueError(f"Erro: O status '{valor}' é inválido.")
         else:
             raise TypeError("Erro: O formato do status é inválido.")
 
@@ -43,7 +42,6 @@ class Locacao:
 
     @data_inicio.setter
     def data_inicio(self, data_ini):
-        # Chama a validação, que já retorna o valor convertido (ou None)
         self.__data_inicio = self.valida_data(data_ini)
 
     @property
@@ -60,7 +58,6 @@ class Locacao:
     
     @veiculo.setter
     def veiculo(self, obj):
-        # Permite None (para inicialização vazia) OU um objeto Veiculo
         if obj is None or isinstance(obj, Veiculo):
             if obj is not None:
                 obj.tentar_alugar()
@@ -86,9 +83,7 @@ class Locacao:
             self.data_fim = None
             return
         else:
-            # Aqui nós chamamos o cálculo e guardamos na variável da locação
             self.valor_locacao = self.calcular_valor_locacao()
-            # chamando o state para liberar o carro no sistema
             if self.veiculo is not None:
                 self.veiculo.tentar_devolver()
 

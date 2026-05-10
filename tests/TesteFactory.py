@@ -11,9 +11,6 @@ def testar_factory():
     print("INICIANDO TESTES DA VEICULO FACTORY")
     print("="*40)
 
-
-
-
     print("\n[Teste 1] Criando um Carro válido...")
     try:
         carro = VeiculoFactory.criar_veiculo(

@@ -3,7 +3,7 @@ from psycopg2 import Error
 
 class DatabaseConfig:
     @staticmethod
-    def get_connetion():
+    def get_connection():
         try:
             conexao = psycopg2.connect(
                 user = "postgres",

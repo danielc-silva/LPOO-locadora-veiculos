@@ -9,7 +9,7 @@ from dao.generic_dao import GenericDAO
 
 class VeiculoDAO (GenericDAO):
     def __init__(self):
-       self.conexao = DatabaseConfig.get_connetion()
+       self.conexao = DatabaseConfig.get_connection()
 
     def salvar(self, objeto_veiculo):
         if not self.conexao:
