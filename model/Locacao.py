@@ -4,7 +4,8 @@ from .LocacaoStrategy import CalculoVIPStrategy, CalculoPadraoStrategy, CalculoL
 from .StatusLocacao import StatusLocacao
 
 class Locacao:
-    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy(), status = StatusLocacao.RESERVADO):
+    def __init__(self, data_inicio=None, data_fim=None, veiculo=Veiculo, estrategia = CalculoPadraoStrategy(), status = StatusLocacao.RESERVADO, id = None):
+        self.id = id
         self.data_inicio = data_inicio
         self.data_fim = data_fim
         self.veiculo = veiculo
@@ -79,9 +80,8 @@ class Locacao:
     def registrar_devolucao_de_veiculo(self, data_devolucao):
         self.data_fim = data_devolucao
         if not (self.data_inicio <= self.data_fim):
-            print(f"A data está incorreta!\nA data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].")
             self.data_fim = None
-            return
+            raise ValueError(f"A data está incorreta! A data de devolução deve ser maior ou igual a data de início: [{self.data_inicio}].")
         else:
             self.valor_locacao = self.calcular_valor_locacao()
             if self.veiculo is not None:

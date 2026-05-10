@@ -29,11 +29,11 @@ class JanelaListagemLocacoes(tk.Toplevel):
         tk.Label(footer, text="MENU", bg="lightgrey", fg="black", font=("Arial", 10, "bold")).pack(side="left", padx=10, pady=5)
 
         tk.Button(footer, text="Sair", command=self.master.destroy).pack(side="right", padx=8, pady=2)
-        tk.Button(footer, text="Nova Reserva", command=self.nova_reserva).pack(side="right", padx=8, pady=2)
-        tk.Button(footer, text="Ver Detalhes", command=self.ver_detalhes).pack(side="right", padx=8, pady=2)
-        tk.Button(footer, text="Locar", command=self.locar_veiculo).pack(side="right", padx=8, pady=2)
-        tk.Button(footer, text="Devolver", command=self.devolver_veiculo).pack(side="right", padx=8, pady=2)
         tk.Button(footer, text="Cancelar", command=self.cancelar_locacao).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Devolver", command=self.devolver_veiculo).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Locar", command=self.locar_veiculo).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Ver Detalhes", command=self.ver_detalhes).pack(side="right", padx=8, pady=2)
+        tk.Button(footer, text="Nova Reserva", command=self.nova_reserva).pack(side="right", padx=8, pady=2)
 
         self.atualizar_lista_na_tela()
 
