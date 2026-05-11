@@ -123,16 +123,6 @@ class JanelaListagemLocacoesAdm(tk.Toplevel):
         self.atualizar_lista_na_tela()
 
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.withdraw()
-    
-    app = JanelaListagemLocacoesAdm(master=root)
-    
-    app.protocol("WM_DELETE_WINDOW", root.destroy)
-    
-    root.mainloop()
-
 
 
 

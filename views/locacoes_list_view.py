@@ -209,15 +209,3 @@ class JanelaListagemLocacoes(tk.Toplevel):
             self.btn_devolver.config(state="disabled")
             self.btn_cancelar.config(state="disabled")
 
-
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.withdraw()
-    
-    app = JanelaListagemLocacoes(master=root)
-    
-    app.protocol("WM_DELETE_WINDOW", root.destroy)
-    
-    root.mainloop()
