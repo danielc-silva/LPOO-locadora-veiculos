@@ -49,6 +49,7 @@ class JanelaListagemLocacoes(tk.Toplevel):
         self.btn_locar.pack(side="right", padx=8, pady=2)
 
         tk.Button(footer, text="Ver Detalhes", command=self.ver_detalhes).pack(side="right", padx=8, pady=2)
+        
         tk.Button(footer, text="Nova Reserva", command=self.nova_reserva).pack(side="right", padx=8, pady=2)
 
         self.atualizar_lista_na_tela()

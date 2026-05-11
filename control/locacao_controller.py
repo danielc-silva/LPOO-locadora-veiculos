@@ -8,6 +8,7 @@ from model.Veiculo import Veiculo
 from model.StatusLocacao import StatusLocacao
 from dao.veiculo_dao import VeiculoDAO
 from dao.locacao_dao import LocacaoDAO
+from model.LocacaoStrategy import *
 
 class LocacaoController:
     def __init__(self):
@@ -15,35 +16,49 @@ class LocacaoController:
         self.veiculo_dao = VeiculoDAO()
 
 
-    def salvar_locacoes (self, placa_str:  str, locacao_inicio_str: str, locacao_fim_str: str, status_str: str):
-        if not placa_str or not locacao_inicio_str or not locacao_fim_str or not status_str:
+    def salvar_locacoes(self, placa_str: str, locacao_inicio_str: str, locacao_fim_str: str, status_str: str, estrategia_str: str):
+        if not all([placa_str, locacao_inicio_str, locacao_fim_str, status_str, estrategia_str]):
             return False, "Preencha todos os campos!"
 
         if status_str == "Selecione o status":
             return False, "Selecione um status válido!"
+        
+        if estrategia_str.upper() == "VIP":
+            estrategia_recebida = CalculoVIPStrategy()
+        else:
+            estrategia_recebida = CalculoPadraoStrategy()
 
         try:
             data_ini = datetime.strptime(locacao_inicio_str.strip(), "%d/%m/%Y").date()
             data_fimm = datetime.strptime(locacao_fim_str.strip(), "%d/%m/%Y").date()
 
-            veiculo_existente = self.veiculo_dao.buscar_por_placa (placa_str.strip().upper())
+            veiculo_existente = self.veiculo_dao.buscar_por_placa(placa_str.strip().upper())
             if not veiculo_existente:
                 return False, f"Veículo com placa {placa_str} não existe no sistema!"
             
-            status_enum = StatusLocacao[status_str.upper()]
+            status_enum = StatusLocacao[status_str.upper().strip()]
 
             nova_locacao = Locacao(
-                data_inicio = data_ini,
-                data_fim = data_fimm,
-                veiculo = veiculo_existente,
-                status = status_enum
+                data_inicio=data_ini,
+                data_fim=data_fimm,
+                veiculo=veiculo_existente,
+                status=status_enum,
+                estrategia=estrategia_recebida
             )
-            nova_locacao.valor_locacao = nova_locacao.calcular_valor_locacao()
+
+            try:
+                nova_locacao.valor_locacao = nova_locacao.calcular_valor_locacao()
+            except Exception:
+
+                nova_locacao.valor_locacao = 0.0
+
             sucesso, msg = self.locacao_dao.salvar(nova_locacao)
             return sucesso, msg
 
+        except ValueError:
+            return False, "Formato de data inválido! Use DD/MM/AAAA."
         except KeyError:
-            return False, "Status inválido!"
+            return False, f"Status '{status_str}' não reconhecido pelo sistema."
         except Exception as e:
             return False, f"Erro inesperado: {e}"
 
@@ -122,7 +137,59 @@ class LocacaoController:
         except Exception as e:
             return False, f"Erro ao processar cancelamento: {e}"
 
+
+    def remover_locacao(self, codigo: str):
+        if not codigo:
+            return False,"Código da locação não informado."
+        try:
+            return self.locacao_dao.remover(codigo.strip())
         
+        except Exception as e:
+            return False, f"Erro inesperado: {e}"
+        
+    def editar_locacao(self, codigo: str, placa: str, data_inii: str, data_fim: str, loc_status: str, valor_loc: str, estrategia_pgt: str):
+        if not all([codigo, placa, data_inii, data_fim, loc_status, estrategia_pgt]):
+            return False, "Preencha todos os campos obrigatórios!"
+        
+        try:
+
+            data_ini = datetime.strptime(data_inii.strip(), "%d/%m/%Y").date()
+            data_fimm = datetime.strptime(data_fim.strip(), "%d/%m/%Y").date()
+
+            veiculo_existente = self.veiculo_dao.buscar_por_placa(placa.strip().upper())
+            if not veiculo_existente:
+                return False, f"Veículo com placa {placa} não encontrado!"
+
+            status_enum = StatusLocacao[loc_status.upper().strip()]
+
+            if estrategia_pgt.upper() == "VIP":
+                estrategia_recebida = CalculoVIPStrategy()
+            else:
+                estrategia_recebida = CalculoPadraoStrategy()
+
+            locacao_editada = Locacao(
+                data_inicio=data_ini,
+                data_fim=data_fimm,
+                veiculo=veiculo_existente,
+                status=status_enum,
+                estrategia=estrategia_recebida
+            )
+            locacao_editada.id = int(codigo) 
+
+            try:
+                locacao_editada.valor_locacao = locacao_editada.calcular_valor_locacao()
+            except Exception:
+                locacao_editada.valor_locacao = float(valor_loc.replace(',', '.'))
+
+            sucesso, msg = self.locacao_dao.atualizar(locacao_editada)
+            return sucesso, msg
+        
+        except ValueError:
+            return False, "Erro nos dados: Verifique o formato de data (DD/MM/AAAA) e valores numéricos."
+        except KeyError:
+            return False, f"Status '{loc_status}' é inválido."
+        except Exception as e:
+            return False, f"Erro inesperado no Controller: {e}"
 
         
         

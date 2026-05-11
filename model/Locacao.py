@@ -105,6 +105,7 @@ class Locacao:
         mostrar += f"\nData inicio: {self.data_inicio}"
         mostrar += f"\nData fim: {self.data_fim}"
         mostrar += f"\nPlaca veículo: {self.veiculo.placa}"
+        mostrar += f"\nCategoria: {self.veiculo.categoria.value}"
         mostrar += f"\nStatus: {self.status.value.upper()}"
         mostrar += f"\nValor locação: {self.valor_locacao}"
         return  mostrar
@@ -115,6 +116,7 @@ class Locacao:
         mostrar += f"\nData inicio: {self.data_inicio}"
         mostrar += f"\nData fim prevista: {self.data_fim}"
         mostrar += f"\nPlaca veículo: {self.veiculo.placa}"
+        mostrar += f"\nCategoria: {self.veiculo.categoria.value}"
         mostrar += f"\nStatus: {self.status.value.upper()}"
         mostrar += f"\nValor estimado: {self.valor_locacao}"
         return  mostrar
