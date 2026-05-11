@@ -21,7 +21,7 @@ def testar_dao():
         print(f"Detalhe: {e}")
         return
 
-    placa_teste = "ABC1D23" 
+    placa_teste = "DES5647" 
     
     try:
         carro_teste = VeiculoFactory.criar_veiculo(

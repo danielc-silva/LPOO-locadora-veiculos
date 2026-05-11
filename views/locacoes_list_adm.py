@@ -10,6 +10,7 @@ from control.locacao_controller import LocacaoController
 from dao.veiculo_dao import VeiculoDAO
 from dao.locacao_dao import LocacaoDAO
 from model.StatusLocacao import StatusLocacao
+from views.locacao_view import JanelaCadastroLocacao
 
 class JanelaListagemLocacoesAdm(tk.Toplevel):
     def __init__(self, master=None):
@@ -65,7 +66,22 @@ class JanelaListagemLocacoesAdm(tk.Toplevel):
 
 
     def editar_locacao (self):
-        pass
+        selecionado = self.tabela.selection()
+        if not selecionado:
+            messagebox.showwarning("Aviso", "Selecione uma locação na tabela para editar.")
+            return
+        
+        valores = self.tabela.item(selecionado[0], "values")
+        codigo_clicado = str(valores[0]).strip()
+
+        locacao_para_editar = self.controller.buscar_por_codigo(codigo_clicado)
+
+        if locacao_para_editar:
+            janela_edicao = JanelaCadastroLocacao(self, locacao_existente= locacao_para_editar)
+            self.wait_window(janela_edicao)
+            self.atualizar_lista_na_tela()
+        else:
+            messagebox.showerror("Erro", "Não foi possível carregar os dados da Locação.")
 
 
     def ver_detalhes(self):
@@ -102,7 +118,9 @@ class JanelaListagemLocacoesAdm(tk.Toplevel):
                 ))
 
     def nova_reserva(self):
-        print("Botão Nova Reserva clicado!")
+        janela_cadastro = JanelaCadastroLocacao(self)
+        self.wait_window(janela_cadastro)
+        self.atualizar_lista_na_tela()
 
 
 if __name__ == "__main__":

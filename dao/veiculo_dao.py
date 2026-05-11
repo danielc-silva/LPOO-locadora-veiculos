@@ -173,3 +173,78 @@ class VeiculoDAO (GenericDAO):
             if cursor:
                 cursor.close()
 
+    def buscar_disponiveis(self, categoria, d_ini, d_fim):
+        veiculos_disponiveis = []
+        sql = """
+            SELECT vei_placa, vei_tipo, vei_taxa_diaria, vei_categoria
+            FROM tb_veiculos
+            WHERE vei_categoria = %s
+            AND vei_placa NOT IN (
+                SELECT vei_placa FROM tb_locacoes
+                WHERE loc_status IN ('reservado','locado')
+                AND NOT (loc_data_fim < %s OR loc_data_inicio > %s)
+            )
+        """
+        cursor = None
+        try:
+            cursor = self.conexao.cursor()
+            cursor.execute(sql, (categoria, d_ini, d_fim))
+            rows = cursor.fetchall()
+
+            from types import SimpleNamespace
+            try:
+                from model.VeiculoFactory import VeiculoFactory
+            except Exception:
+                VeiculoFactory = None
+            try:
+                from model.Categoria import Categoria
+            except Exception:
+                Categoria = None
+
+            for row in rows:
+                placa = row[0]
+                tipo = row[1]
+                taxa = row[2] if row[2] is not None else 0.0
+                cat_raw = row[3]
+
+                cat_val = cat_raw
+                if Categoria:
+                    try:
+                        cat_val = Categoria(cat_raw)
+                    except Exception:
+                        try:
+                            cat_val = Categoria[str(cat_raw).upper()]
+                        except Exception:
+                            cat_val = cat_raw
+
+                veiculo_obj = None
+                if VeiculoFactory:
+                    try:
+                        veiculo_obj = VeiculoFactory.criar_veiculo(tipo_veiculo=tipo, placa=placa, categoria=cat_val, taxa_diaria=taxa)
+                    except Exception:
+                        veiculo_obj = None
+
+                if veiculo_obj is None:
+                    veiculo_obj = SimpleNamespace(
+                        placa=placa,
+                        modelo=None,
+                        nome=None,
+                        marca=None,
+                        tipo=tipo,
+                        taxa_diaria=taxa,
+                        categoria=cat_val
+                    )
+
+                veiculos_disponiveis.append(veiculo_obj)
+
+            return veiculos_disponiveis
+
+        except Exception as e:
+            if self.conexao:
+                self.conexao.rollback()
+            print(f"Erro ao buscar veículos disponíveis: {e}")
+            return []
+        finally:
+            if cursor:
+                cursor.close()
+

@@ -10,6 +10,7 @@ from control.locacao_controller import LocacaoController
 from dao.veiculo_dao import VeiculoDAO
 from dao.locacao_dao import LocacaoDAO
 from model.StatusLocacao import StatusLocacao
+from views.locacao_view import JanelaCadastroLocacao
 
 class JanelaListagemLocacoes(tk.Toplevel):
     def __init__(self, master=None):
@@ -73,7 +74,9 @@ class JanelaListagemLocacoes(tk.Toplevel):
         self.verificar_botoes()
 
     def nova_reserva(self):
-        print("Botão Nova Reserva clicado!")
+        janela_cadastro = JanelaCadastroLocacao(self)
+        self.wait_window(janela_cadastro)
+        self.atualizar_lista_na_tela()
 
     def ver_detalhes(self):
         selecionado = self.tabela.selection()

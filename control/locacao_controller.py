@@ -15,7 +15,6 @@ class LocacaoController:
         self.locacao_dao = LocacaoDAO()
         self.veiculo_dao = VeiculoDAO()
 
-
     def salvar_locacoes(self, placa_str: str, locacao_inicio_str: str, locacao_fim_str: str, status_str: str, estrategia_str: str):
         if not all([placa_str, locacao_inicio_str, locacao_fim_str, status_str, estrategia_str]):
             return False, "Preencha todos os campos!"
@@ -31,6 +30,9 @@ class LocacaoController:
         try:
             data_ini = datetime.strptime(locacao_inicio_str.strip(), "%d/%m/%Y").date()
             data_fimm = datetime.strptime(locacao_fim_str.strip(), "%d/%m/%Y").date()
+
+            if data_fimm < data_ini:
+                return False, "A data de devolução não pode ser anterior à data de início!"
 
             veiculo_existente = self.veiculo_dao.buscar_por_placa(placa_str.strip().upper())
             if not veiculo_existente:
@@ -152,9 +154,11 @@ class LocacaoController:
             return False, "Preencha todos os campos obrigatórios!"
         
         try:
+            data_ini_obj = datetime.strptime(data_inii.strip(), "%d/%m/%Y").date()
+            data_fim_obj = datetime.strptime(data_fim.strip(), "%d/%m/%Y").date()
 
-            data_ini = datetime.strptime(data_inii.strip(), "%d/%m/%Y").date()
-            data_fimm = datetime.strptime(data_fim.strip(), "%d/%m/%Y").date()
+            if data_fim_obj < data_ini_obj:
+                return False, "A data de devolução não pode ser anterior à data de início!"
 
             veiculo_existente = self.veiculo_dao.buscar_por_placa(placa.strip().upper())
             if not veiculo_existente:
@@ -168,8 +172,8 @@ class LocacaoController:
                 estrategia_recebida = CalculoPadraoStrategy()
 
             locacao_editada = Locacao(
-                data_inicio=data_ini,
-                data_fim=data_fimm,
+                data_inicio=data_ini_obj, 
+                data_fim=data_fim_obj,
                 veiculo=veiculo_existente,
                 status=status_enum,
                 estrategia=estrategia_recebida
@@ -179,18 +183,28 @@ class LocacaoController:
             try:
                 locacao_editada.valor_locacao = locacao_editada.calcular_valor_locacao()
             except Exception:
-                locacao_editada.valor_locacao = float(valor_loc.replace(',', '.'))
+                valor_limpo = valor_loc.strip().replace(',', '.')
+                locacao_editada.valor_locacao = float(valor_limpo) if valor_limpo else 0.0
 
             sucesso, msg = self.locacao_dao.atualizar(locacao_editada)
             return sucesso, msg
         
-        except ValueError:
-            return False, "Erro nos dados: Verifique o formato de data (DD/MM/AAAA) e valores numéricos."
+        except ValueError as e:
+            return False, f"Erro nos dados: Verifique o formato de data (DD/MM/AAAA) ou valores. Detalhe: {e}"
         except KeyError:
             return False, f"Status '{loc_status}' é inválido."
         except Exception as e:
             return False, f"Erro inesperado no Controller: {e}"
-
+        
+    
+    def filtrar_veiculos_disponiveis(self, categoria, data_ini_str, data_fim_str):
+        try:
+            d_ini = datetime.strptime(data_ini_str, "%d/%m/%Y").date()
+            d_fim = datetime.strptime(data_fim_str, "%d/%m/%Y").date()
+            
+            return self.veiculo_dao.buscar_disponiveis(categoria, d_ini, d_fim)
+        except:
+            return []
         
         
 
