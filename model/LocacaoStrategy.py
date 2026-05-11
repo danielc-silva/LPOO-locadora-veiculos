@@ -6,13 +6,18 @@ class CalculoLocacaoStrategy (ABC):
     def calcuar_diarias(self, veiculo : Veiculo, dias : int) -> float:
         pass
 
-class CalculoPadraoStrategy (CalculoLocacaoStrategy):
+class CalculoPadraoStrategy(CalculoLocacaoStrategy):
     def calcuar_diarias(self, veiculo, dias):
-        valor_diarias = veiculo.taxa_diaria * dias
-
-        return (valor_diarias + veiculo.valor_seguro)
+        taxa = float(veiculo.taxa_diaria)
+        seguro = float(veiculo.valor_seguro)
+        
+        valor_diarias = taxa * dias
+        return valor_diarias + seguro
     
-class CalculoVIPStrategy (CalculoLocacaoStrategy):
-    def calcuar_diarias(self, veiculo: Veiculo, dias):
-        valor_diarias = veiculo.taxa_diaria * dias
-        return ((valor_diarias * 0.8) + veiculo.valor_seguro)
+class CalculoVIPStrategy(CalculoLocacaoStrategy):
+    def calcuar_diarias(self, veiculo, dias):
+        taxa = float(veiculo.taxa_diaria)
+        seguro = float(veiculo.valor_seguro)
+        
+        valor_diarias = taxa * dias
+        return (valor_diarias * 0.8) + seguro

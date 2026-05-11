@@ -36,7 +36,7 @@ def testar_dao():
 
     nova_locacao = Locacao(
         veiculo=carro_teste,
-        data_inicio=date(2026, 5, 10),
+        data_inicio=date(2026, 5, 7),
         data_fim=date(2026, 5, 15),
         status=StatusLocacao.RESERVADO
     )

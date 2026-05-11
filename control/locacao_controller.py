@@ -1,9 +1,13 @@
-from dao.locacao_dao import LocacaoDAO
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from datetime import datetime, date
 from model.Locacao import Locacao
 from model.Veiculo import Veiculo
 from model.StatusLocacao import StatusLocacao
 from dao.veiculo_dao import VeiculoDAO
+from dao.locacao_dao import LocacaoDAO
 
 class LocacaoController:
     def __init__(self):
@@ -34,6 +38,7 @@ class LocacaoController:
                 veiculo = veiculo_existente,
                 status = status_enum
             )
+            nova_locacao.valor_locacao = nova_locacao.calcular_valor_locacao()
             sucesso, msg = self.locacao_dao.salvar(nova_locacao)
             return sucesso, msg
 
@@ -70,27 +75,33 @@ class LocacaoController:
             locacao_existente.data_inicio = hoje
 
         locacao_existente.status = StatusLocacao.LOCADO
+        locacao_existente.valor_locacao = locacao_existente.calcular_valor_locacao()
 
         sucesso, msg = self.locacao_dao.atualizar(locacao_existente)
         return sucesso, msg
 
-    def devolver_veiculo (self, codigo_loc_str):
-        locacao_existente = self.locacao_dao.buscar_por_codigo(codigo_loc_str.strip())
-        if not locacao_existente:
-            return False, f"Locação de código {codigo_loc_str} não encontrada."
+    def devolver_veiculo(self, codigo_loc_str):
+        locacao = self.locacao_dao.buscar_por_codigo(codigo_loc_str.strip())
+        
+        if not locacao:
+            return False, f"Locação #{codigo_loc_str} não encontrada."
 
-        if locacao_existente.status != StatusLocacao.LOCADO:
-            return False, "Apenas veículos locados podem ser devolvidos."
-
-        hoje = date.today()
-
+        if locacao.status != StatusLocacao.LOCADO:
+            return False, "O veículo não consta como 'LOCADO' para este código."
         try:
-            locacao_existente.registrar_devolucao_de_veiculo(hoje)
+            hoje = date.today()
+            locacao.status = StatusLocacao.DEVOLVIDO
+            locacao.data_fim = hoje
+            locacao.valor_locacao = locacao.calcular_valor_locacao()
 
-            sucesso, msg = self.locacao_dao.atualizar(locacao_existente)
-            return sucesso, msg
+            sucesso, msg = self.locacao_dao.atualizar(locacao)
+            
+            if sucesso:
+                return True, f"Veículo da locação #{codigo_loc_str} devolvido com sucesso!"
+            return False, msg
+
         except Exception as e:
-            return False, f"Erro ao processar devolução: {e}"
+            return False, f"Falha ao processar devolução: {e}"
         
     def calcelar_reserva (self, codigo_loc_str):
         locacao_existente = self.locacao_dao.buscar_por_codigo(codigo_loc_str.strip())

@@ -60,8 +60,6 @@ class Locacao:
     @veiculo.setter
     def veiculo(self, obj):
         if obj is None or isinstance(obj, Veiculo):
-            if obj is not None:
-                obj.tentar_alugar()
             self.__veiculo = obj
         else:
             raise TypeError("O valor informado deve ser um objeto do tipo Veículo!")
@@ -70,12 +68,14 @@ class Locacao:
         if self.data_fim is None:
             raise ValueError("Impossível calcular o valor, a data de devolução não foi definida.")
 
-        if self.data_inicio == self.data_fim:
-            diferenca_de_dias = 1
-        else:
-            diferenca_de_dias = (self.data_fim - self.data_inicio).days
-            
-        return self.estrategia.calcuar_diarias(self.veiculo, diferenca_de_dias)
+        delta = self.data_fim - self.data_inicio
+        dias_brutos = delta.days
+        
+        diferenca_de_dias = dias_brutos if dias_brutos > 0 else 1
+                
+        self.valor_locacao = self.estrategia.calcuar_diarias(self.veiculo, diferenca_de_dias)
+        
+        return self.valor_locacao
     
     def registrar_devolucao_de_veiculo(self, data_devolucao):
         self.data_fim = data_devolucao
@@ -99,7 +99,33 @@ class Locacao:
             raise ValueError(
                 f"ERRO: Data '{data_recebida}' em formato inválido. Use DD-MM-YYYY."
             )
-        
+    def exibir_dados(self):
+        mostrar = f"\nMostrando dados da Locação"
+        mostrar += f"\nCódigo: {self.id}"
+        mostrar += f"\nData inicio: {self.data_inicio}"
+        mostrar += f"\nData fim: {self.data_fim}"
+        mostrar += f"\nPlaca veículo: {self.veiculo.placa}"
+        mostrar += f"\nStatus: {self.status.value.upper()}"
+        mostrar += f"\nValor locação: {self.valor_locacao}"
+        return  mostrar
+    
+    def exibir_previsao(self):
+        mostrar = f"\nMostrando dados da Locação"
+        mostrar += f"\nCódigo: {self.id}"
+        mostrar += f"\nData inicio: {self.data_inicio}"
+        mostrar += f"\nData fim prevista: {self.data_fim}"
+        mostrar += f"\nPlaca veículo: {self.veiculo.placa}"
+        mostrar += f"\nStatus: {self.status.value.upper()}"
+        mostrar += f"\nValor estimado: {self.valor_locacao}"
+        return  mostrar
+    
+    def exibir_basico(self):
+        mostrar = f"\nMostrando dados da Locação"
+        mostrar += f"\nCódigo: {self.id}"
+        mostrar += f"\nData inicio: {self.data_inicio}"
+        mostrar += f"\nPlaca veículo: {self.veiculo.placa}"
+        mostrar += f"\nStatus: {self.status.value.upper()}"
+        return  mostrar
 
     def __str__(self):
         mostrar = "==================================="

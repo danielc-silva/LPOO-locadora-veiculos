@@ -159,7 +159,7 @@ class VeiculoDAO (GenericDAO):
                     tipo_veiculo=linha[0], 
                     placa=linha[1], 
                     categoria=cat_enum, 
-                    taxa_diaria=float(linha[3])
+                    taxa_diaria=float(linha[3]),
                 )
                 return veiculo_encontrado
             else:
