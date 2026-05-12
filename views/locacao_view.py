@@ -113,6 +113,8 @@ class JanelaCadastroLocacao(tk.Toplevel):
             self.frame_codigo.pack_forget()
             self.frame_valor.pack_forget()
             self.frame_placa_manual.pack_forget()
+            self.cb_status.set("RESERVADO")
+            self.cb_status.config(state="disabled")
             self.geometry("380x380")
 
 
